@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react';
+import axios from 'axios';
 
 const StoreContext = createContext();
 
@@ -9,17 +10,18 @@ export const StoreProvider = ({ children }) => {
   // Base URL for API calls
   const baseURL = 'https://certificat-backend.onrender.com';
 
+  // Create an axios instance with the base URL
+  const api = axios.create({
+    baseURL,
+  });
+
   // Example API call function
   const fetchData = async (endpoint) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${baseURL}${endpoint}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      return data;
+      const response = await api.get(endpoint);
+      return response.data;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -32,6 +34,7 @@ export const StoreProvider = ({ children }) => {
     loading,
     error,
     baseURL,
+    api, // Export the axios instance
     fetchData,
   };
 
